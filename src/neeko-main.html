@@ -1,0 +1,63 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="salesforce-lightning-design-system-2.2.1/assets/styles/salesforce-lightning-design-system.min.css" />
+    </head>
+    <body>
+        <header class="slds-global-header_container">
+            <div class="slds-global-header slds-grid slds-grid--align-spread slds-wrap">
+                <div class="slds-global-header__item">
+                    <div class="slds-global-header__logo">
+                        <img src="salesforce-lightning-design-system-2.2.1/assets/images/logo-noname.svg" />
+                    </div>
+                </div>
+                <div class="slds-text-heading--large slds-text-align--center slds-text">
+                    Ana
+                </div>
+                <ul class="slds-global-header__item slds-grid slds-grid--vertical-align-center">
+                    <li>
+                        <span class="slds-icon_container slds-icon-standard-people">
+                            <svg class="slds-icon slds-icon--medium" aria-hidden="true">
+                                <use xlink:href="salesforce-lightning-design-system-2.2.1/assets/icons/standard-sprite/svg/symbols.svg#people"></use>
+                            </svg>
+                        </span>
+                    </li>
+                </ul>
+                
+            </div>
+            <div id="buildBar" class="slds-global-header slds-grid slds-grid--pull-padded-x-small slds-m-top--x-medium slds-grid--align-spread slds-p-around--medium slds-border--bottom">
+                <button id="buildBtn" class="slds-button slds-button--success"> BUILD!</button>
+                <button id="myBtn" class="slds-button slds-button--neutral">my</button>
+            </div>
+        </header>
+            <div id="mainPanel" class="slds-grid slds-grid--vertical-stretch main-panel" style="margin-top: 100px"> <!--style="margin-top: 100px">-->
+                <div id="fileListPanel" class="slds-col slds-m-horizontal--large slds-border--right slds-size--1-of-1 slds-scrollable slds-has-dividers--around-space"> 
+                </div>
+                <div class="slds-size--1-of-1 slds-scrollable slds-m-horizontal--large">
+                    <pre id="fileContents">
+                    </pre>
+                </div>
+            </div>
+            <div id="buildPanel" class="slds-hide slds-grid slds-grid--vertical-stretch" style="margin-top: 100px">
+                <div class="slds-col slds-size--1-of-1 slds-m-horizontal--large slds-m-top--x-large slds-is-relative">
+                    <div role="status" class="slds-spinner slds-spinner--medium slds-align--absolute-center">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+                <div id="stdoutPanel" class="slds-size--1-of-1 slds-scrollable slds-m-horizontal--large slds-p-left--large slds-p-bottom--xx-large slds-border--left">
+                    yolo
+                </div>
+            </div>
+                
+
+        
+         <div id="programName" class="slds-docked-form-footer">
+             Current branch:
+        </div> 
+
+        <script>require('./start.js')</script>
+        <script>require('./fileDisplayer.js')</script>
+        <script>require('./buildExecutor.js')</script>
+    </body>
+</html>

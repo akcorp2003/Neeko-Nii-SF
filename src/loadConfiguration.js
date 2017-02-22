@@ -8,42 +8,34 @@ const fileDisplayer = require('./fileDisplayer')
 
 const configFilepath = path.join(__dirname, '..', 'configs', 'build.config')
 const envFilepath = path.join(__dirname, '..', 'configs', 'build.env')
+const win32 = "win32"
 var repoFilepath
+var workspaceFilepath
 var currentBranchName
+var branchCacheInterval = null
 
-exports.pathToRepo = repoFilepath
-exports.activeBranchName = currentBranchName
+let branchNamesCache = new Set()
 
-function setTitle (done) {
-    //git command for looking at current branch name
-    exec('git rev-parse --abbrev-ref HEAD', {
-        cwd: repoFilepath
-    }, (err, stdout, stderr) => {
-        currentBranchName = stdout
-        var programTitle = document.getElementById("programName")
-        console.log('setted branch name to: ' + currentBranchName)
-        programTitle.innerText += " " + currentBranchName
-        done(null, currentBranchName)
-    })
-}
-
-exports.loadRepoDirectory = _ => {
+exports.populateMainWindow = _ => {
     console.log('Config file path using join: ' + configFilepath)
-    if(fs.existsSync(configFilepath)){
+    if( fs.existsSync(configFilepath) ){
         const configFileLine = readline.createInterface({
             input: fs.createReadStream(configFilepath)
         })
 
         configFileLine.on('line', (line) => {
            var filePaths = line.split('=')
-           if(filePaths != null){
-               if(filePaths[0].trim().localeCompare('repo.path') === 0){
+           if( filePaths != null ){
+               if( filePaths[0].trim().localeCompare('repo.path') === 0 ){
                     console.log(filePaths[1].trim())
                     repoFilepath = filePaths[1].trim()
+
                     setTitle( (err, branchName) => {
                         fileDisplayer.loadDirtyFiles(repoFilepath, branchName)
-                    })
-                    
+                    })    
+               } else if( filePaths[0].trim().localeCompare('workspace.path') === 0 ) {
+                    console.log(filePaths[1].trim())
+                    workspaceFilepath = filePaths[1].trim()
                }
            }
         })
@@ -64,24 +56,28 @@ exports.updateTitle = _ => {
         cwd: repoFilepath
     }, (err, stdout, stderr) => {
         var branchName = stdout
-        var programTitle = document.getElementById("programName")
+        var programTitle = document.getElementById("branchName")
         var branchNameOnScreen = programTitle.innerText.replace('Current branch: ', '');
+
         if( branchName.localeCompare(branchNameOnScreen) !== 0 ) {
+            console.log('clearing selectedFiles cache')
+            fileDisplayer.clearFilesCache()
             programTitle.innerText = programTitle.innerText.replace(branchNameOnScreen, '')
-            programTitle.innerText += ' ' + branchName
+            programTitle.innerText = 'Current branch: ' + branchName
             currentBranchName = branchName
         }
     })
 }
 
 exports.setBuildBar = _ => {
+    clearBuildBar()    
+
     if(fs.existsSync(envFilepath)) {
         const envFileLine = readline.createInterface({
             input: fs.createReadStream(envFilepath)
         })
 
         envFileLine.on('line', (line) => {
-            console.log(line.trim())
             if( line.trim().localeCompare("#") != 0 && line.trim() )
             {
                 var buildBar = document.getElementById("buildBar")
@@ -113,4 +109,86 @@ exports.setBuildBar = _ => {
     } else {
         console.log('Whoops! Can\'t find the env file.')
     }
+}
+
+function clearBuildBar() {
+    var buildBar = document.getElementById("buildBar")
+    var childNodes = Array.from(buildBar.children)
+                    .filter( function getCustomEnvironments(envButton) {
+                        console.log(envButton)
+                        if( envButton.getAttribute("id") != null ) {
+                            if( envButton.getAttribute("id").localeCompare("buildBtn") === 0 || envButton.getAttribute("id").localeCompare("myEnvBtn") === 0) {
+                                return false
+                            } else {
+                                return true
+                            }
+                        }
+                        else {
+                            return true
+                        }
+                    })
+                    .forEach( function removeChildFromBuildBar(childButton) {
+                        buildBar.removeChild(childButton)
+                    })
+    
+}
+
+exports.getRepoFilePath = _ => {
+    return repoFilepath
+}
+
+exports.getWorkspaceFilePath = _ => {
+    return workspaceFilepath
+}
+
+exports.getCurrentBranchName = _ => {
+    return document.getElementById("branchName").innerText.replace('Current branch: ', '').replace(/(\r\n|\n|\r)/gm,"")
+}
+
+function setTitle (done) {
+    //git command for looking at current branch name
+    exec('git rev-parse --abbrev-ref HEAD', {
+        cwd: repoFilepath
+    }, (err, stdout, stderr) => {
+        currentBranchName = stdout
+        var programTitle = document.getElementById("branchName")
+        console.log('setted branch name to: ' + currentBranchName)
+        programTitle.innerText += " " + currentBranchName
+        done(null, currentBranchName)
+    })
+}
+
+exports.cacheBranchNames = _ => {
+    runCacheBranchNames()
+}
+
+function runCacheBranchNames() {
+    if( repoFilepath ) {
+        clearInterval(branchCacheInterval)
+        exec('git branch -a', {
+            cwd: repoFilepath
+        }, (err, stdout, stderr) => {
+            var branchNames
+            if( process.platform.localeCompare(win32) === 0 ) {
+                branchNames = stdout.split('\r\n')
+            }
+            branchNames = stdout.toString().split('\n')
+
+            branchNames.forEach( function addToCache(branchName) {
+                if( branchName ) {
+                    var cleanedBranchName = branchName.trim().replace(/\*/g, "").replace(/remotes\/origin\//, "").trim()
+                    branchNamesCache.add(cleanedBranchName)
+                }   
+            })
+        })
+
+    } else {
+        console.log('Repo filepath is not ready yet!')
+        clearTimeout(branchCacheInterval)
+        branchCacheInterval = setTimeout( function () { runCacheBranchNames() }, 250 )
+    }
+}
+
+exports.cacheHasBranchName = ( branchName ) => {
+    return branchNamesCache.has(branchName)
 }

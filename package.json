@@ -12,6 +12,7 @@
     "electron": "^1.4.15"
   },
   "dependencies": {
+    "fix-path": "^2.1.0",
     "rimraf": "^2.5.4"
   }
 }

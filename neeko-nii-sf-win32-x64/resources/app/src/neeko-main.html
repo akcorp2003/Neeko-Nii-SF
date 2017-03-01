@@ -1,0 +1,197 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="salesforce-lightning-design-system-2.2.1/assets/styles/salesforce-lightning-design-system.min.css" />
+        <link rel="stylesheet" href="styles/styles.css" />
+    </head>
+    <body>
+        <header class="slds-global-header_container">
+            <div class="slds-global-header slds-grid slds-grid--align-spread slds-wrap">
+                <div class="slds-global-header__item">
+                    <div class="slds-global-header__logo">
+                        <img src="salesforce-lightning-design-system-2.2.1/assets/images/logo-noname.svg" />
+                    </div>
+                </div>
+                <div class="slds-text-heading--large slds-text-align--center slds-text">
+                    Ana
+                </div>
+                <ul class="slds-global-header__item slds-grid slds-grid--vertical-align-center">
+                    <li>
+                        <span class="slds-icon_container slds-icon-standard-people">
+                            <svg class="slds-icon slds-icon--medium" aria-hidden="true">
+                                <use xlink:href="salesforce-lightning-design-system-2.2.1/assets/icons/standard-sprite/svg/symbols.svg#people"></use>
+                            </svg>
+                        </span>
+                    </li>
+                </ul>
+                
+            </div>
+            <div id="menu" class="slds-global-header slds-p-around--x-small">
+                <div class="slds-icon menuIcon">
+                    <img src="salesforce-lightning-design-system-2.2.1/assets/icons/utility/rows_60.png" />
+                </div>
+            </div>
+            
+        </header>
+        <div id="sideBar" class="slds-size--1-of-3 slds-border--right sideBarBackground sideBarMinimized">
+            <div class="slds-grid slds-size--1-of-1 slds-align--absolute-center slds-p-vertical--medium circle">
+                <svg width="50" height="50" viewBox="0 0 50 50">
+                    <circle cx="25"
+                            cy="25"
+                            r="25"
+                            style="fill: #2b8cbe;"/> <!--for selected #a8ddb5 -->
+                    <text font-size="26"
+                        fill="white"
+                        x="16.8"
+                        y="33.4" 
+                        style="font-family: Salesforce Sans, Verdana, sans-serif">1</text>
+                </svg>
+                
+                <div class="slds-p-around--small slds-text-heading--medium expandedText slds-hide">
+                    Create Feature
+                </div>
+            </div>
+            <div class="slds-grid slds-size--1-of-1 slds-align--absolute-center slds-p-vertical--medium circle secondCircle">
+                <svg width="50" height="50" viewBox="0 0 50 50">
+                    <circle cx="25"
+                            cy="25"
+                            r="25"
+                            style="fill: #2b8cbe;"/> <!--for selected #a8ddb5 -->
+                    <text font-size="26"
+                        fill="white"
+                        x="16.8"
+                        y="33.4" 
+                        style="font-family: Salesforce Sans, Verdana, sans-serif;">2</text>
+                </svg>
+                
+                <div class="slds-p-around--small slds-text-heading--medium expandedText slds-hide">
+                    Deploy
+                </div>
+            </div>
+            <div class="slds-grid slds-size--1-of-1 slds-align--absolute-center slds-p-vertical--medium circle">
+                <svg width="50" height="50" viewBox="0 0 50 50">
+                    <circle cx="25"
+                            cy="25"
+                            r="25"
+                            style="fill: #2b8cbe;"/> <!--for selected #a8ddb5 -->
+                    <text font-size="26"
+                        fill="white"
+                        x="16.8"
+                        y="33.4" 
+                        style="font-family: Salesforce Sans, Verdana, sans-serif">3</text>
+                </svg>
+                <div class="slds-p-around--small slds-text-heading--medium expandedText slds-hide">
+                    Finish Feature
+                </div>
+            </div>
+        </div>
+        <div id="featurePanel" class="slds-scrollable" style="margin-top: 100px; margin-left: 90px;">
+            <div class="slds-grid slds-align--absolute-center" style="margin-top: 90px; padding-top: 75px;">
+                <div class="slds-p-around--medium">
+                    <svg width="50" height="50" viewBox="0 0 24 24">
+                        <circle cx="12"
+                                cy="12"
+                                r="12"
+                                style="fill: #34becd;"/>
+                        <text font-size="13"
+                            fill="white"
+                            x="8.1"
+                            y="16.3" 
+                            style="font-family: Salesforce Sans, Verdana, sans-serif">1</text>
+                    </svg>
+                </div>
+                <div class="slds-p-around--medium">
+                    <div id="featureNameInput" class="slds-form-element slds-size--1-of-1">
+                        <label class="slds-text-heading--large" for="branch-name">Your branch name: </label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="branch-name" class="slds-input" placeholder="Your branch name here." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="gitOutputPanel" class="slds-size--1-of-1 slds-align--absolute-center slds-scrollable">
+                <pre id="gitOutput" style="height: 200px;">
+                </pre>
+            </div>
+        </div>
+
+        <div id="mainPanel" class="slds-hide slds-grid main-panel" style="margin-top: 100px; margin-left: 90px;">  
+            <div id="fileListPanel" class="slds-m-horizontal--large slds-m-bottom--x-large slds-border--right slds-scrollable slds-has-dividers--bottom-space slds-size--3-of-7">
+                
+            </div>
+            <div class="slds-size--4-of-7 slds-p-top--large">
+                <div id="buildBar" class="slds-size--1-of-1 slds-scrollable slds-p-bottom--large">
+                    <div id="buttonStrip" class="slds-button-group">
+                        <button id="buildBtn" class="slds-button slds-button--success">BUILD!</button>
+                        <button id="myEnvBtn" class="slds-button slds-button--neutral">my</button>
+                    </div>
+                    
+                </div>
+                <div class="slds-size--1-of-1 slds-scrollable slds-m-horizontal--small slds-border--top">
+                    <xmp class="slds-size--1-of-1 slds-p-bottom--x-large" id="fileContents">
+                    </xmp>
+                </div>
+                    
+                    
+                
+            </div>
+            
+        </div>
+        
+       
+        <div id="buildPanel" class="slds-hide slds-grid slds-grid--vertical-stretch" style="margin-top: 100px; margin-left: 90px;">
+            <div class="slds-col slds-size--1-of-1 slds-m-horizontal--large slds-m-top--x-large slds-is-relative">
+                <div role="status" class="slds-spinner slds-spinner--medium slds-align--absolute-center">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+            <div id="stdoutPanel" class="slds-size--1-of-1 slds-scrollable slds-m-horizontal--large slds-p-left--medium slds-p-bottom--xx-large slds-border--left">
+            </div>
+        </div>
+
+        <div id="finishFeaturePanel" class="slds-hide" style="margin-top: 100px; margin-left: 90px;">
+            <div class="slds-size--1-of-1 slds-text-heading--large slds-align--absolute-center slds-p-around--medium" style="margin-top: 90px;">
+                Ready to finish feature?
+            </div>
+            <div class="slds-size--1-of-1 slds-align--absolute-center slds-p-around--small" style="margin-top: 90px;">
+                <div class="slds-p-around--medium">
+                    <svg width="50" height="50" viewBox="0 0 24 24">
+                        <circle cx="12"
+                                cy="12"
+                                r="12"
+                                style="fill: #34becd;"/>
+                        <text font-size="13"
+                            fill="white"
+                            x="8.1"
+                            y="16.3" 
+                            style="font-family: Salesforce Sans, Verdana, sans-serif">1</text>
+                    </svg>
+                </div>
+                <div class="slds-p-around--medium">
+                    <button class="slds-button slds-button--success slds-p-around--small slds-text-heading--medium" id="finishFeature">FINISH FEATURE</button>
+                </div>
+            </div>
+            <div id="gitFinishFeatureOutputPanel" class="slds-size--1-of-1 slds-scrollable slds-p-bottom--xx-large slds-align--absolute-center">
+                <pre id="finishFeatureOutputPanel" style="height: 250px;">
+                </pre>
+            </div>
+        </div>
+                
+
+        
+         <div id="branchName" class="slds-hide slds-docked-form-footer">
+             Current branch:
+        </div> 
+        <div id="featureFooter" class="slds-docked-form-footer">
+            <button type="button" id="createFeature" class="slds-button slds-button--brand">CREATE FEATURE!</button>
+        </div>
+
+        <script>require('./circleHandler.js')</script>
+        <script>require('./panelDisplayer.js')</script>
+        <script>require('./start.js')</script>
+        <script>require('./fileDisplayer.js')</script>
+        <script>require('./featureCreator.js')</script>
+        <script>require('./featureCompleter.js')</script>
+    </body>
+</html>

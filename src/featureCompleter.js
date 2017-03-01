@@ -33,35 +33,43 @@ function runCompleteFeature( currentBranchName ) {
     var featureOutputPanel = document.getElementById("finishFeatureOutputPanel")
     featureOutputPanel.innerHTML = ""
 
-    exec('git pull origin develop', {
+    exec('git push -u origin ' + currentBranchName, {
         cwd: repoPath
     }, (err, stdout, stderr) => {
-        displayLineToOutput("Running git pull origin develop as the first step in the git flow process.")
+        displayLineToOutput("Running git push -u origin " + currentBranchName)
         displayLineToOutput(stdout)
         displayLineToOutput(stderr)
 
-        exec('git checkout develop', {
+        exec('git pull origin develop', {
             cwd: repoPath
         }, (err, stdout, stderr) => {
-            displayLineToOutput("Checking out develop.")
+            displayLineToOutput("Running git pull origin develop as the first step in the git flow process.")
             displayLineToOutput(stdout)
             displayLineToOutput(stderr)
 
-            exec('git merge ' + currentBranchName, {
+            exec('git checkout develop', {
                 cwd: repoPath
             }, (err, stdout, stderr) => {
-                displayLineToOutput("Merging your feature branch " + currentBranchName + " with develop.")
+                displayLineToOutput("Checking out develop.")
                 displayLineToOutput(stdout)
                 displayLineToOutput(stderr)
 
-                exec('git push', {
+                exec('git merge ' + currentBranchName, {
                     cwd: repoPath
                 }, (err, stdout, stderr) => {
-                    displayLineToOutput("Pushing your changes to the remote.")
+                    displayLineToOutput("Merging your feature branch " + currentBranchName + " with develop.")
                     displayLineToOutput(stdout)
                     displayLineToOutput(stderr)
-                    displayLineToOutput("Alright! Make sure there are no errors in the error messages. I printed everything out so you should be able to see if something went wrong.")
-                    displayLineToOutput("I left your feature branch " + currentBranchName + " intact. You can delete it by running \"git branch -d " + currentBranchName + "\"")
+
+                    exec('git push', {
+                        cwd: repoPath
+                    }, (err, stdout, stderr) => {
+                        displayLineToOutput("Pushing your changes to the remote.")
+                        displayLineToOutput(stdout)
+                        displayLineToOutput(stderr)
+                        displayLineToOutput("Alright! Make sure there are no errors in the error messages. I printed everything out so you should be able to see if something went wrong.")
+                        displayLineToOutput("I left your feature branch " + currentBranchName + " intact. You can delete it by running \"git branch -d " + currentBranchName + "\"")
+                    })
                 })
             })
         })

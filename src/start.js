@@ -5,21 +5,28 @@ const electron = require('electron')
 
 const { ipcRenderer: ipc } = electron
 
+
 const dialog = require('electron').remote.dialog
+const BrowserWindow = require('electron').remote.BrowserWindow
 
 const configurationLoader = require('./loadConfiguration')
-const buildExecutor = require('./buildExecutor')
 const featureCreator = require('./featureCreator')
+const buildExecutor = require('./buildExecutor')
 const featureCompleter = require('./featureCompleter')
 const panelDisplayer = require('./panelDisplayer')
 const circleHandler = require('./circleHandler')
+const menuIconHandler = require('./menuIcon')
 
 const defaultCircleColor = "#2b8cbe"
 const selectedCircleColor = "#a8ddb5" 
 
-var interval = null
+var dirtyFilesInterval = null
+
 var cacheBranchNamesInterval = null
 let branchNameTimer
+var buildWindows = []
+
+var btnEnvironmentToWindowID = {}
 
 window.addEventListener('DOMContentLoaded', _ => {
     console.log(__dirname)
@@ -27,13 +34,46 @@ window.addEventListener('DOMContentLoaded', _ => {
 
     var buildButton = document.getElementById("buildBtn")
     buildButton.addEventListener("click", function () {
-        buildExecutor.runBuildProcess(this, ( workingBuildDirectory ) => {
-            console.log('inside the callback: ' + workingBuildDirectory)
+        module.exports.resetDirtyFilesInterval()
 
-            buildExecutor.executeNETCoreSFBuild(workingBuildDirectory, function executeAnt ( workingAntDirectory ) {
-                buildExecutor.executeAnt(workingAntDirectory)
-            })
+        var buttonList = document.getElementById("buttonStrip")
+        Array.from(buttonList.children)
+        .filter(function (button) {
+            return button.classList.contains("slds-button--brand")
         })
+        .forEach(function (selectedButton) {
+            let buildWindow = new BrowserWindow({
+                                                    width: 873,
+                                                    height: 363,
+                                                    resizeable: false
+                                                })
+
+            buildWindow.loadURL(`file://${__dirname}/buildScreen.html`)
+
+            buildWindow.on('close', _ => {
+                //buildWindow = null
+                buildExecutor.killAllBuildProcesses()
+                console.log('I closed')
+            })
+
+            console.log(selectedButton.innerText.toLowerCase())
+
+            btnEnvironmentToWindowID[selectedButton.innerText.toLowerCase()] = buildWindow.id
+
+            buildWindow.webContents.on('did-finish-load', () => {
+                buildWindow.webContents.send('set-env-name', selectedButton.innerText)
+                buildExecutor.runBuildProcess(selectedButton, buildWindow, document, ( workingBuildDirectory ) => {
+                    console.log('inside the callback: ' + workingBuildDirectory)
+
+                    buildExecutor.executeNETCoreSFBuild(workingBuildDirectory, buildWindow, document, function executeAnt ( workingAntDirectory ) {
+                        buildExecutor.executeAnt(workingAntDirectory, selectedButton.innerText, buildWindow, document)
+                    })
+                })
+            })
+
+            buildWindows.push(buildWindow)
+        })
+        
     })
 
     var myEnvButton = document.getElementById("myEnvBtn")
@@ -46,6 +86,12 @@ window.addEventListener('DOMContentLoaded', _ => {
             this.classList.add("slds-button--brand")
         }
     })
+
+    var menuIcon = document.getElementById("menu")
+    menuIcon.onclick = function () {
+        console.log('menu icon clicked!')
+        menuIconHandler.openOrCloseMenu(document)
+    }
 
     var createFeatureButton = document.getElementById("createFeature")
     createFeatureButton.addEventListener("click", function onClick() {
@@ -96,19 +142,20 @@ window.addEventListener('DOMContentLoaded', _ => {
 
     circleHandler.setCirclesOnSideBar()
 
-    configurationLoader.setBuildBar()
+    configurationLoader.setBuildStrip()
+
     
 
-    interval = setInterval( function() { configurationLoader.findDirtyFiles() }, 5000 )
+    dirtyFilesInterval = setInterval( function() { configurationLoader.findDirtyFiles() }, 5000 )
     cacheBranchNamesInterval = setInterval( function() { configurationLoader.cacheBranchNames() }, 1000)
 })
 
 exports.resetDirtyFilesInterval = _ => {
-    clearInterval(interval)
+    clearInterval(dirtyFilesInterval)
 }
 
 exports.startDirtyFilesInterval = _ => {
-    interval = setInterval( function() { configurationLoader.findDirtyFiles() }, 5000 )
+    dirtyFilesInterval = setInterval( function() { configurationLoader.findDirtyFiles() }, 5000 )
 }
 
 exports.resetCacheBranchNamesInterval = _ => {
@@ -119,5 +166,5 @@ window.setInterval( function() { configurationLoader.updateTitle() }, 5000)
 
 ipc.on('settings-closed', (evt) => {
     configurationLoader.populateMainWindow()
-    configurationLoader.setBuildBar()
+    configurationLoader.setBuildStrip()
 })

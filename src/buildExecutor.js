@@ -7,6 +7,7 @@ const rimraf = require('rimraf')
 const os = require('os')
 
 const { ipcRenderer: ipc } = electron
+const remote = require('electron').remote
 const dialog = require('electron').remote.dialog
 
 const configurationLoader = require('./loadConfiguration')
@@ -16,15 +17,11 @@ const NETCoreFolder = "sf-build"
 const NETCoreDLLName = "sfbuild.dll"
 const returnButtonID = "returnButton"
 
-exports.runBuildProcess = (button, done) => {
-    disableButton(button)
+var sfbuildDotNet
+var antMigrationTool
 
-    showBuildPanel()
-
+exports.runBuildProcess = (button, buildWindow, document, done) => {
     var branchName = document.getElementById("branchName").innerText.replace("Current branch: ", "").replace(/(\r\n|\n|\r)/gm,"")
-    
-    starter.resetDirtyFilesInterval()
-
     var listOfFiles = document.getElementById("fileListPanel")
     var filesToBuildIntoManifest = Array.from(listOfFiles.childNodes)
         .filter( function (fileItem) {
@@ -36,6 +33,7 @@ exports.runBuildProcess = (button, done) => {
             return classesWithFilePath[0].innerText
         })
 
+    buildWindow.webContents.send('update-manifest-stage')
     if( filesToBuildIntoManifest.length === 0 ) {
         dialog.showMessageBox({
             type: "warning",
@@ -44,28 +42,30 @@ exports.runBuildProcess = (button, done) => {
             message: "You currently don't have any files in the manifest. \n\nAre you sure you want to continue with the build?"},
             ( function (response) {
                 if( response === 0 ) {
-                    executeBuild(filesToBuildIntoManifest, branchName, done)
+                    executeBuild(filesToBuildIntoManifest, button, branchName, buildWindow, done)
                 } else {
-                    reenableBuildButton()
-                    returnInterfaceToStartup()
-                    starter.startDirtyFilesInterval()
+                    buildWindow.destroy()
                     return
                 }
             })
         )
     } else {
-        executeBuild(filesToBuildIntoManifest, branchName, done)
+        executeBuild(filesToBuildIntoManifest, button, branchName, buildWindow, done)
     }
 }
 
-function executeBuild(filesToBuildIntoManifest, branchName, done) {
+function executeBuild(filesToBuildIntoManifest, button, branchName, buildWindow, done) {
     var workspacePath = configurationLoader.getWorkspaceFilePath()
     console.log('WORKSPACE PATH: ' + workspacePath)
-    var directoryName = path.join(workspacePath, branchName.replace(/\//g, "_"))
+    var directoryName = path.join(workspacePath, button.innerText.toLowerCase() + "_" + branchName.replace(/\//g, "_"))
     if(!fs.existsSync(directoryName)){
+
         fs.mkdirSync(directoryName)
+        buildWindow.webContents.send('update-text-status', 'Writing manifest...')
         writeManifest(directoryName, filesToBuildIntoManifest)
+        buildWindow.webContents.send('update-manifest-stage')
         done(directoryName)
+
     } else {
         dialog.showMessageBox({ 
             type: "warning", 
@@ -74,16 +74,17 @@ function executeBuild(filesToBuildIntoManifest, branchName, done) {
             message: "You previously built a deployment for this branch. It is in " + directoryName + ". \n\nClicking Yes will DELETE the folder and its contents. \n\nClicking No will stop this build and leave your folder intact. "},
             ( function (response) {
                 if( response === 0 ) {
+
                     rimraf(directoryName, function() {
-                        console.log('recreating the branch directory...')
                         fs.mkdirSync(directoryName)
+                        buildWindow.webContents.send('update-text-status', 'Writing manifest...')
                         writeManifest(directoryName, filesToBuildIntoManifest)
+                        buildWindow.webContents.send('update-manifest-stage')
                         done(directoryName)
                     })
+
                 } else {
-                    reenableBuildButton()
-                    returnInterfaceToStartup()
-                    starter.startDirtyFilesInterval()
+                    buildWindow.destroy()
                     return
                 }
             })
@@ -92,24 +93,21 @@ function executeBuild(filesToBuildIntoManifest, branchName, done) {
     }
 }
 
-exports.executeNETCoreSFBuild = ( workingDirectory, done ) => {
+exports.executeNETCoreSFBuild = ( workingDirectory, buildWindow, document, done ) => {
+    buildWindow.webContents.send('update-text-status', 'Packaging files...')
+    buildWindow.webContents.send('update-packaging-stage')
+
     var workspaceFolderPath = configurationLoader.getWorkspaceFilePath()
     var sfBuildExecutionPath = path.join(workspaceFolderPath, NETCoreFolder, NETCoreDLLName)
     console.log('execution path: ' + sfBuildExecutionPath)
-    console.log('workign directory: ' + workingDirectory)
-    //if(fs.existsSync())
-    var sfbuildDotNet = spawn('dotnet',  [sfBuildExecutionPath], {
+    console.log('working directory: ' + workingDirectory)
+
+    sfbuildDotNet = spawn('dotnet',  [sfBuildExecutionPath], {
         cwd: workingDirectory
     })
 
     sfbuildDotNet.stdout.on('data', function(data) {
-        var outputPanel = document.getElementById("stdoutPanel")
-        var paragraph = document.createElement("p")
-        var stdoutput = document.createTextNode(data)
-        paragraph.appendChild(stdoutput)
-
-        outputPanel.appendChild(paragraph)
-    
+        buildWindow.webContents.send('update-stdout-panel', data)
     })
 
     sfbuildDotNet.stderr.on('data', function(data) {
@@ -118,7 +116,7 @@ exports.executeNETCoreSFBuild = ( workingDirectory, done ) => {
 
     sfbuildDotNet.on('exit', function(code) {
         console.log('child process exited with: ' + code.toString())
-        reenableBuildButton()
+        buildWindow.webContents.send('update-packaging-stage')
         done(workingDirectory)
     })
 
@@ -130,74 +128,72 @@ exports.executeNETCoreSFBuild = ( workingDirectory, done ) => {
             message: "I think you didn\'t install .NET Core. Please install it."
         }, _ => {
             console.log(err)
-            console.log(sfBuildExecutionPath)
-            reenableBuildButton()
+            buildWindow.webContents.send('rollback-stages')
             return
         })
     })
 }
 
-exports.executeAnt = ( workingDirectory ) => {
-    console.log('Ant directory: ' + workingDirectory)
-
-    //grab the selected environment
-    var buildBarChildren = document.getElementById("buildBar").childNodes
-    //console.log(Array.from(buildBarChildren))
-    var array = Array.from(buildBarChildren)
-    var selectedEnvironments = Array.from(buildBarChildren).filter( function ( button ) {
-        if( button.nodeType !== Node.TEXT_NODE ) {
-            return button.classList.contains("slds-button--brand")
-        } else {
-            return false
-        }   
-    }).map( function ( selectedButton ) {
-        if( selectedButton != null ) {
-            return selectedButton.innerHTML.trim().toLowerCase().replace(/(\r\n|\n|\r)/gm,"")
-        }
-    })
+exports.executeAnt = ( workingDirectory, buildEnvironment, buildWindow, document ) => {
 
     //only supporting one environment deployment at the moment
-    console.log('Environments selected: ' + selectedEnvironments)
+    console.log('Environment selected: ' + buildEnvironment)
 
-    var antMigrationTool = spawn('ant', ["deploy_" + selectedEnvironments[0]], {
+    var failed = 0
+
+    buildWindow.webContents.send('update-ant-stage')
+    buildWindow.webContents.send('update-text-status', 'Running ant deploy_' + buildEnvironment.toLowerCase())
+
+    antMigrationTool = spawn('ant', ["deploy_" + buildEnvironment.toLowerCase()], {
         cwd: workingDirectory
     })
 
     antMigrationTool.stdout.on('data', function(data) {
-        var outputPanel = document.getElementById("stdoutPanel")
-        var paragraph = document.createElement("p")
-        var stdoutput = document.createTextNode(data)
-        paragraph.appendChild(stdoutput)
+        if(data.includes("Request for a deploy submitted successfully")) {
+            //indicates the server likes us
+            buildWindow.webContents.send('update-ant-stage')
+            buildWindow.webContents.send('update-deploy-stage')
+        }
 
-        outputPanel.appendChild(paragraph)
+        if(data.includes("failed") || data.includes("fail") || data.includes("FAILED") || data.includes("Failed")) {
+            console.log('FAILED!! FAILED!! FAILED!!')
+            failed = 1
+        }
+        buildWindow.webContents.send('update-stdout-panel', data)
     })
 
     antMigrationTool.stderr.on('data', function(data) {
-        console.log(data.toString())
+        buildWindow.webContents.send('update-stdout-panel', data.toString())
     })
 
     antMigrationTool.on('exit', function(code) {
         console.log('child process exited with: ' + code.toString())
-        dialog.showMessageBox({
-            title: "Completed",
-            type: "info",
-            buttons: ["OK"],
-            message: "Please check the side panel to see if your deployment succeeded."
-        }, _ => {
-            var outputPanel = document.getElementById("stdoutPanel")
-            var backButton = document.createElement("button")
-            backButton.className += "slds-button slds-button--neutral"
-            backButton.innerHTML += "BACK"
-
-            backButton.addEventListener("click", function onClick() {
-                returnInterfaceToStartup()
+        if( failed === 1 ) {
+            dialog.showMessageBox({
+                title: "Error",
+                type: "info",
+                buttons: ["OK"],
+                message: "Oh noes! Something went wrong! Click 'Show More' to see what happened. \n\n Close the build window after you're done."
+            }, _ => {
+                starter.startDirtyFilesInterval()
+                buildWindow.webContents.send('update-text-status', 'Error...')
+                buildWindow.webContents.send('failed')
             })
-            var paddingParagraph = document.createElement("br")
-            outputPanel.appendChild(paddingParagraph)
-            outputPanel.appendChild(backButton)
 
-            starter.startDirtyFilesInterval()
-        })
+        } else {
+            dialog.showMessageBox({
+                title: "Completed",
+                type: "info",
+                buttons: ["OK"],
+                message: "Yay! Everything went well. \n\n For a sanity check, click 'Show More' just to be sure I deployed your items."
+            }, _ => {
+                starter.startDirtyFilesInterval()
+                buildWindow.webContents.send('update-deploy-stage')
+                buildWindow.webContents.send('update-text-status', 'Completed!')
+                buildWindow.webContents.send('all-complete')
+            })
+        }
+        
     })
 
     antMigrationTool.on('error', (err) => {
@@ -207,6 +203,7 @@ exports.executeAnt = ( workingDirectory ) => {
             buttons: ["OK"],
             message: "I think you don\'t have Ant in your PATH. Please add it."
         }, _ => {
+            buildWindow.webContents.send('rollback-stages')
             return
         })
     })
@@ -279,4 +276,11 @@ function writeManifest( parentDirectoryToManifest, filesToAddIntoManifest ) {
     })
 
     file.end()
+}
+
+exports.killAllBuildProcesses = _ => {
+    sfbuildDotNet.stdout.pause()
+    sfbuildDotNet.kill('SIGINT')
+    antMigrationTool.stdout.pause()
+    antMigrationTool.kill('SIGINT')
 }

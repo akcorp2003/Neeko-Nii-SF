@@ -25,12 +25,14 @@
                 </ul>
                 
             </div>
-            <div id="buildBar" class="slds-global-header slds-grid slds-grid--pull-padded-x-small slds-m-top--x-medium slds-grid--align-spread slds-p-around--medium slds-border--bottom">
-                <button id="buildBtn" class="slds-button slds-button--success"> BUILD!</button>
-                <button id="myEnvBtn" class="slds-button slds-button--neutral">my</button>
+            <div id="menu" class="slds-global-header slds-p-around--x-small">
+                <div class="slds-icon menuIcon">
+                    <img src="salesforce-lightning-design-system-2.2.1/assets/icons/utility/rows_60.png" />
+                </div>
             </div>
+            
         </header>
-        <div id="sideBar" class="slds-size--1-of-3 slds-border--right sideBarBackground">
+        <div id="sideBar" class="slds-size--1-of-3 slds-border--right sideBarBackground sideBarMinimized">
             <div class="slds-grid slds-size--1-of-1 slds-align--absolute-center slds-p-vertical--medium circle">
                 <svg width="50" height="50" viewBox="0 0 50 50">
                     <circle cx="25"
@@ -43,8 +45,12 @@
                         y="33.4" 
                         style="font-family: Salesforce Sans, Verdana, sans-serif">1</text>
                 </svg>
+                
+                <div class="slds-p-around--small slds-text-heading--medium expandedText slds-hide">
+                    Create Feature
+                </div>
             </div>
-            <div class="slds-grid slds-size--1-of-1 slds-align--absolute-center slds-p-vertical--medium circle">
+            <div class="slds-grid slds-size--1-of-1 slds-align--absolute-center slds-p-vertical--medium circle secondCircle">
                 <svg width="50" height="50" viewBox="0 0 50 50">
                     <circle cx="25"
                             cy="25"
@@ -56,6 +62,10 @@
                         y="33.4" 
                         style="font-family: Salesforce Sans, Verdana, sans-serif;">2</text>
                 </svg>
+                
+                <div class="slds-p-around--small slds-text-heading--medium expandedText slds-hide">
+                    Deploy
+                </div>
             </div>
             <div class="slds-grid slds-size--1-of-1 slds-align--absolute-center slds-p-vertical--medium circle">
                 <svg width="50" height="50" viewBox="0 0 50 50">
@@ -69,6 +79,9 @@
                         y="33.4" 
                         style="font-family: Salesforce Sans, Verdana, sans-serif">3</text>
                 </svg>
+                <div class="slds-p-around--small slds-text-heading--medium expandedText slds-hide">
+                    Finish Feature
+                </div>
             </div>
         </div>
         <div id="featurePanel" class="slds-scrollable" style="margin-top: 100px; margin-left: 90px;">
@@ -101,14 +114,27 @@
             </div>
         </div>
 
-        <div id="mainPanel" class="slds-hide slds-grid slds-grid--vertical-stretch main-panel" style="margin-top: 100px; margin-left: 90px;">  
-            <div id="fileListPanel" class="slds-col slds-m-horizontal--large slds-m-bottom--x-large slds-border--right slds-size--1-of-1 slds-scrollable slds-has-dividers--bottom-space">
+        <div id="mainPanel" class="slds-hide slds-grid main-panel" style="margin-top: 100px; margin-left: 90px;">  
+            <div id="fileListPanel" class="slds-m-horizontal--large slds-m-bottom--x-large slds-border--right slds-scrollable slds-has-dividers--bottom-space slds-size--3-of-7">
                 
             </div>
-            <div class="slds-size--1-of-1 slds-scrollable slds-m-horizontal--large">
-                <pre id="fileContents">
-                </pre>
+            <div class="slds-size--4-of-7 slds-p-top--large">
+                <div id="buildBar" class="slds-size--1-of-1 slds-scrollable slds-p-bottom--large">
+                    <div id="buttonStrip" class="slds-button-group">
+                        <button id="buildBtn" class="slds-button slds-button--success">BUILD!</button>
+                        <button id="myEnvBtn" class="slds-button slds-button--neutral">my</button>
+                    </div>
+                    
+                </div>
+                <div class="slds-size--1-of-1 slds-scrollable slds-m-horizontal--small slds-border--top">
+                    <xmp class="slds-size--1-of-1 slds-p-bottom--x-large" id="fileContents">
+                    </xmp>
+                </div>
+                    
+                    
+                
             </div>
+            
         </div>
         
        
@@ -155,7 +181,7 @@
 
         
          <div id="branchName" class="slds-hide slds-docked-form-footer">
-             Current branch:  
+             Current branch:
         </div> 
         <div id="featureFooter" class="slds-docked-form-footer">
             <button type="button" id="createFeature" class="slds-button slds-button--brand">CREATE FEATURE!</button>
@@ -165,7 +191,6 @@
         <script>require('./panelDisplayer.js')</script>
         <script>require('./start.js')</script>
         <script>require('./fileDisplayer.js')</script>
-        <script>require('./buildExecutor.js')</script>
         <script>require('./featureCreator.js')</script>
         <script>require('./featureCompleter.js')</script>
     </body>

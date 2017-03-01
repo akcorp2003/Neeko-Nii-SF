@@ -18,8 +18,9 @@ app.on('ready', _ => {
         resizeable: false
     })
 
-    mainWindow.loadURL(`file://${__dirname}/Ana-main.html`)
+    mainWindow.loadURL(`file://${__dirname}/neeko-main.html`)
 
+    mainWindow.toggleDevTools()
     mainWindow.on('close', _ => {
         mainWindow = null
     })

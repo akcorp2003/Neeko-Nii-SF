@@ -5,9 +5,13 @@ const readline = require('readline')
 
 const configurationLoader = require('./loadConfiguration')
 
+const remote = require('electron').remote
+const dialog = require('electron').remote.dialog
+
 const sfHTMLIcon = "salesforce-lightning-design-system-2.2.1/assets/icons/doctype-sprite/svg/symbols.svg#html"
 const sfHTMLIconPNG = "salesforce-lightning-design-system-2.2.1/assets/icons/doctype/html_60.png"
 const win32 = "win32"
+const fileNotFound = "FILE NOT FOUND!"
 
 //will store the cleaned filepaths of files
 let selectedFilesCache = []
@@ -35,6 +39,28 @@ let selectedFilesCache = []
 </div>
 */
 
+
+exports.loadDirtyFiles = (pathToRepoDirectory, currentBranchName) => {
+    exec('git diff --name-only --diff-filter=duxb develop ' + currentBranchName, {
+        cwd: pathToRepoDirectory
+    }, (err, stdout, stderr) => {
+        //clear out the current dirty files
+        //this might not be the most optimum way to do it...
+        var dirtyFileList = document.getElementById("fileListPanel")
+        while( dirtyFileList.firstChild ) {
+            dirtyFileList.removeChild(dirtyFileList.firstChild)
+        }
+
+        createFilePanels(pathToRepoDirectory, currentBranchName, stdout, _ => {
+            createSelectAllButton()
+        })
+    })
+}
+
+exports.clearFilesCache = _ => {
+    selectedFilesCache = []
+}
+
 function createSelectAllButton() {
     var fileListPanel = document.getElementById("fileListPanel")
 
@@ -49,11 +75,9 @@ function createSelectAllButton() {
             return !node.classList.contains("selectedFile") && !node.classList.contains("slds-button")
         })
         .forEach( function selectNode(itemNode) {
-            console.log(itemNode)
             itemNode.classList.add("selectedFile")
 
             var filePathName = itemNode.getElementsByClassName("fullFilePath")[0].innerText
-            console.log(filePathName)
             if( !selectedFilesCache.includes(filePathName) ) {
                 selectedFilesCache.push(filePathName)
             }
@@ -73,14 +97,14 @@ function createFilePanels(pathToRepoDirectory, currentBranchName, stdout, done) 
     lines = stdout.toString().split('\n')
     lines.forEach(function(line) {
         if( line.trim() ) {
-            var folderAndFileNames = line.split(path.sep)
+            //regardless of platform, git always outputs the "/"
+            var folderAndFileNames = line.split("/")
             var parentDirectories = folderAndFileNames.splice(0, folderAndFileNames.length - 1)
 
             var filename = folderAndFileNames[0]
 
             //remove the root folder
             parentDirectories.splice(0, 1)
-            console.log(parentDirectories)
             var cleanedFilepath = path.join.apply(null, parentDirectories.concat(folderAndFileNames))
 
             var itemDiv = document.createElement("div")
@@ -110,21 +134,26 @@ function createFilePanels(pathToRepoDirectory, currentBranchName, stdout, done) 
                                     
                 this.classList.toggle("selectedFile")
                 
+                var fileContents = document.getElementById("fileContents")
+                //first clear out the existing text
+                fileContents.innerHTML = ""
                 if(fs.existsSync(pathToFile)){
-                    //first clear out the existing text
-                    var fileContents = document.getElementById("fileContents")
-                    fileContents.innerHTML = ""
-
-                    const fileLine = readline.createInterface({
-                        input: fs.createReadStream(pathToFile)
+                    fs.readFile(pathToFile, (err, data) => {
+                        if( err ) {
+                            dialog.showMessageBox({
+                                type: "error",
+                                buttons: ["OK"],
+                                title: "Error Reading File",
+                                message: "There was an error loading the file." + '\n\n' + err
+                            }, function (response) {
+                                return
+                            })
+                        } else {
+                            fileContents.innerHTML = data
+                        }
                     })
-
-                    fileLine.on('line', (line) => {
-                        fileContents.innerHTML += line + "\n"
-                    })
-
-
                 } else {
+                    fileContents.innerHTML = fileNotFound + "\n"
                     console.log('Could not find file!!')
                 }
             })
@@ -185,23 +214,6 @@ function createFilePanels(pathToRepoDirectory, currentBranchName, stdout, done) 
     done(null)
 }
 
-exports.loadDirtyFiles = (pathToRepoDirectory, currentBranchName) => {
-    exec('git diff --name-only develop ' + currentBranchName, {
-        cwd: pathToRepoDirectory
-    }, (err, stdout, stderr) => {
-        //clear out the current dirty files
-        //this might not be the most optimum way to do it...
-        var dirtyFileList = document.getElementById("fileListPanel")
-        while( dirtyFileList.firstChild ) {
-            dirtyFileList.removeChild(dirtyFileList.firstChild)
-        }
-
-        createFilePanels(pathToRepoDirectory, currentBranchName, stdout, _ => {
-            createSelectAllButton()
-        })
-    })
-}
-
-exports.clearFilesCache = _ => {
-    selectedFilesCache = []
+exports.clearFileContentsPanel = _ => {
+    document.getElementById("fileContents").innerHTML = ""
 }

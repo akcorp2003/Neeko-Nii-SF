@@ -57,19 +57,21 @@ exports.updateTitle = _ => {
     }, (err, stdout, stderr) => {
         var branchName = stdout
         var programTitle = document.getElementById("branchName")
-        var branchNameOnScreen = programTitle.innerText.replace('Current branch: ', '');
+        var branchNameOnScreen = programTitle.innerHTML.replace("Current branch: ", "")
 
-        if( branchName.localeCompare(branchNameOnScreen) !== 0 ) {
+        if( branchName !== branchNameOnScreen ) {
             console.log('clearing selectedFiles cache')
             fileDisplayer.clearFilesCache()
-            programTitle.innerText = programTitle.innerText.replace(branchNameOnScreen, '')
-            programTitle.innerText = 'Current branch: ' + branchName
+            programTitle.innerHTML = programTitle.innerHTML.replace(branchNameOnScreen, "")
+            programTitle.innerHTML = 'Current branch: ' + branchName
             currentBranchName = branchName
+            module.exports.findDirtyFiles()
+            fileDisplayer.clearFileContentsPanel()
         }
     })
 }
 
-exports.setBuildBar = _ => {
+exports.setBuildStrip = _ => {
     clearBuildBar()    
 
     if(fs.existsSync(envFilepath)) {
@@ -80,7 +82,7 @@ exports.setBuildBar = _ => {
         envFileLine.on('line', (line) => {
             if( line.trim().localeCompare("#") != 0 && line.trim() )
             {
-                var buildBar = document.getElementById("buildBar")
+                var buttonStrip = document.getElementById("buttonStrip")
                 var envButton = document.createElement("button")
                 envButton.className += "slds-button slds-button--neutral"
                 if(line.trim().localeCompare("prod") != 0) {
@@ -102,7 +104,7 @@ exports.setBuildBar = _ => {
                     
                 })
 
-                buildBar.appendChild(envButton)
+                buttonStrip.appendChild(envButton)
             }
             
         })
@@ -112,7 +114,7 @@ exports.setBuildBar = _ => {
 }
 
 function clearBuildBar() {
-    var buildBar = document.getElementById("buildBar")
+    var buildBar = document.getElementById("buttonStrip")
     var childNodes = Array.from(buildBar.children)
                     .filter( function getCustomEnvironments(envButton) {
                         console.log(envButton)
@@ -152,8 +154,7 @@ function setTitle (done) {
     }, (err, stdout, stderr) => {
         currentBranchName = stdout
         var programTitle = document.getElementById("branchName")
-        console.log('setted branch name to: ' + currentBranchName)
-        programTitle.innerText += " " + currentBranchName
+        programTitle.innerHTML = "Current branch: " + currentBranchName
         done(null, currentBranchName)
     })
 }

@@ -1,0 +1,30 @@
+.hoverable:hover {
+    background-color: #66d3fa;
+    color: #FFF;
+    cursor: pointer;
+}
+
+.selectedFile {
+    background-color: #66d3fa;
+    color: #FFF;
+}
+
+.sideBarBackground {
+    height: 100%;
+    width: 90px;
+    background-color: #16325c;
+    color: #FFF;
+}
+
+#sideBar {
+    position: fixed;
+
+}
+
+.circle {
+    cursor: pointer;
+}
+
+.slds-input {
+    width: 400px;
+}

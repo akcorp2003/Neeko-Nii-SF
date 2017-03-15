@@ -14,7 +14,8 @@ const win32 = "win32"
 const fileNotFound = "FILE NOT FOUND!"
 
 //will store the cleaned filepaths of files
-let selectedFilesCache = []
+let selectedFilesToBuildCache = []
+let selectedFilesToCommitCache = []
 
 //this function aims to create a DOM element that looks like the following:
 /*
@@ -51,25 +52,29 @@ exports.loadDirtyFiles = (pathToRepoDirectory, currentBranchName) => {
             dirtyFileList.removeChild(dirtyFileList.firstChild)
         }
 
-        createFilePanels(pathToRepoDirectory, currentBranchName, stdout, _ => {
-            createSelectAllButton()
+        createFilePanels(pathToRepoDirectory, currentBranchName, stdout, dirtyFileList, _ => {
+            createSelectAllButton(dirtyFileList)
         })
     })
 }
 
 exports.clearFilesCache = _ => {
-    selectedFilesCache = []
+    selectedFilesToBuildCache = []
 }
 
-function createSelectAllButton() {
-    var fileListPanel = document.getElementById("fileListPanel")
+exports.clearCommitedFilesCache = _ => {
+    selectedFilesToCommitCache = []
+}
+
+function createSelectAllButton(panelToPopulate) {
+    var fileListPanel = panelToPopulate
 
     var selectAllButton = document.createElement("button")
     selectAllButton.innerText = "Select All"
     selectAllButton.classList.add("slds-button")
     selectAllButton.classList.add("slds-button--neutral")
     selectAllButton.addEventListener("click", function selectAll() {
-        var listOfFiles = document.getElementById("fileListPanel")
+        var listOfFiles = panelToPopulate
         Array.from(listOfFiles.childNodes)
         .filter(function(node) {
             return !node.classList.contains("selectedFile") && !node.classList.contains("slds-button")
@@ -78,8 +83,14 @@ function createSelectAllButton() {
             itemNode.classList.add("selectedFile")
 
             var filePathName = itemNode.getElementsByClassName("fullFilePath")[0].innerText
-            if( !selectedFilesCache.includes(filePathName) ) {
-                selectedFilesCache.push(filePathName)
+            if(panelToPopulate.id == 'fileListPanel') {
+                if( !selectedFilesToBuildCache.includes(filePathName) ) {
+                    selectedFilesToBuildCache.push(filePathName)
+                } 
+            } else if(panelToPopulate.id == 'commitFileListPanel') {
+                if( !selectedFilesToCommitCache.includes(filePathName) ) {
+                    selectedFilesToCommitCache.push(filePathName)
+                }
             }
             
         })
@@ -88,7 +99,7 @@ function createSelectAllButton() {
     fileListPanel.insertBefore(selectAllButton, fileListPanel.firstChild)
 }
 
-function createFilePanels(pathToRepoDirectory, currentBranchName, stdout, done) {
+function createFilePanels(pathToRepoDirectory, currentBranchName, stdout, panelToPopulate, done) {
     var lines
     if( process.platform.localeCompare(win32) === 0 ) {
         lines = stdout.toString().split('\r\n')
@@ -112,10 +123,16 @@ function createFilePanels(pathToRepoDirectory, currentBranchName, stdout, done) 
             itemDiv.classList.add("hoverable")
 
 
-            if( selectedFilesCache.includes(cleanedFilepath) ) {
-                itemDiv.classList.add("selectedFile")
+            //maintain the selected status
+            if( panelToPopulate.id == 'fileListPanel' ) {
+                if( selectedFilesToBuildCache.includes(cleanedFilepath) ) {
+                    itemDiv.classList.add("selectedFile")
+                }
+            } else {
+                if( selectedFilesToCommitCache.includes(cleanedFilepath) ) {
+                    itemDiv.classList.add("selectedFile")
+                }
             }
-            
 
             itemDiv.addEventListener('click', function clicked() {
                 var myPath = this.getElementsByClassName("fullFilePath")
@@ -123,18 +140,40 @@ function createFilePanels(pathToRepoDirectory, currentBranchName, stdout, done) 
 
                 if( this.classList.contains("selectedFile") ) {
                     console.log('removing: ' + myPath[0].innerText)
-                    var index = selectedFilesCache.indexOf(myPath[0].innerText)
-                    if( index > -1 ) {
-                        selectedFilesCache.splice(index, 1)
+                    if(panelToPopulate.id == 'fileListPanel') {
+                        var index = selectedFilesToBuildCache.indexOf(myPath[0].innerText)
+                        if( index > -1 ) {
+                            selectedFilesToBuildCache.splice(index, 1)
+                        }
+                    } else {
+                        var index = selectedFilesToCommitCache.indexOf(myPath[0].innerText)
+                        if( index > -1 ) {
+                            selectedFilesToCommitCache.splice(index, 1)
+                        }
                     }
+                    
                 } else {
                     console.log('adding: ' + myPath[0].innerText)
-                    selectedFilesCache.push(myPath[0].innerText)
+                    if( panelToPopulate.id == 'fileListPanel' ) {
+                        selectedFilesToBuildCache.push(myPath[0].innerText)
+                    } else {
+                        console.log('added to commit cache')
+                        selectedFilesToCommitCache.push(myPath[0].innerText)
+                    }
+                    
                 }
                                     
                 this.classList.toggle("selectedFile")
                 
-                var fileContents = document.getElementById("fileContents")
+                //to differentiate which file panel to populate, there is a class on the file panel
+                //that will indicate which file contents panel to populate
+                var fileContents
+                if( panelToPopulate.id == 'fileListPanel' ) {
+                    fileContents = document.getElementById("fileContents")
+                } else {
+                    fileContents = document.getElementById("uncommitedFileContents")
+                }
+
                 //first clear out the existing text
                 fileContents.innerHTML = ""
                 if(fs.existsSync(pathToFile)){
@@ -207,7 +246,7 @@ function createFilePanels(pathToRepoDirectory, currentBranchName, stdout, done) 
 
             itemDiv.appendChild(tileDiv)
 
-            document.getElementById("fileListPanel").appendChild(itemDiv)
+            panelToPopulate.appendChild(itemDiv)
         }  
     })
 
@@ -216,4 +255,19 @@ function createFilePanels(pathToRepoDirectory, currentBranchName, stdout, done) 
 
 exports.clearFileContentsPanel = _ => {
     document.getElementById("fileContents").innerHTML = ""
+}
+
+exports.loadUncommitedFiles = (pathToRepoDirectory, currentBranchName) => {
+    exec('git diff --name-only', {
+        cwd: pathToRepoDirectory
+    }, (err, stdout, stderr) => {
+        var uncommitedFileList = document.getElementById("commitFileListPanel")
+        while( uncommitedFileList.firstChild ) {
+            uncommitedFileList.removeChild(uncommitedFileList.firstChild)
+        }
+
+        createFilePanels(pathToRepoDirectory, currentBranchName, stdout, uncommitedFileList, _ => {
+            createSelectAllButton(uncommitedFileList)
+        })        
+    })
 }

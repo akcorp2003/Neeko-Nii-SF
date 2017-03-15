@@ -1,18 +1,35 @@
 const electron = require('electron')
-const {remote, ipcRenderer } = electron
+const { ipcRenderer } = electron
 
-//const buildExecutor = require('./buildExecutor')
+const remote = require('electron').remote
+
+const dialog = require('electron').remote.dialog
 
 window.addEventListener('DOMContentLoaded', _ => {
-    console.log('hello!')
     var showMoreButton = document.getElementById("expandArrow")
     showMoreButton.addEventListener("click", function onClick() {
         document.getElementById("stdoutPanel").classList.toggle("slds-hide")
+        this.classList.toggle("transform90Degs")
+
+        var buildWindow = remote.getCurrentWindow()
+        console.log(buildWindow)
+
+        if( this.classList.contains("transform90Degs") ) {
+            buildWindow.setSize(873, 473, true)
+        } else {
+            buildWindow.setSize(873, 203, true)
+        }
+    })
+
+    var abortButton = document.getElementById("abort")
+    abortButton.addEventListener("click", function onClick() {
+        console.log("clicked!")
+        ipcRenderer.send("abort", "yolo")
     })
 })
 
 ipcRenderer.on('set-env-name', (event, buttonName) => {
-    document.getElementById("envName").innerText = buttonName
+    document.getElementById("envName").innerText = "Environment: " + buttonName
 })
 
 ipcRenderer.on('update-text-status', (event, message) => {
@@ -49,7 +66,9 @@ ipcRenderer.on('update-stdout-panel', (event, message) => {
 })
 
 ipcRenderer.on('all-complete', (event) => {
-    document.getElementById("completedSign").classList.toggle("slds-hide")
+    var completedStage = document.getElementById("completed")
+    updateStageElement(completedStage)
+    updateStageElement(completedStage)
 })
 
 ipcRenderer.on('failed', (event) => {
@@ -65,6 +84,12 @@ ipcRenderer.on('rollback-stages', (event) => {
         stage.classList.remove("slds-is-complete")
         stage.classList.add("slds-is-incomplete")
     })
+})
+
+ipcRenderer.on('activate-abort-button', (event) => {
+    console.log('caught!')
+    var abortButton = document.getElementById("abort")
+    abortButton.removeAttribute("disabled")
 })
 
 function updateStageElement( element ) {

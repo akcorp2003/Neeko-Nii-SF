@@ -13,14 +13,15 @@ app.on('ready', _ => {
     
 
     mainWindow = new BrowserWindow({
-        width: 945,
-        height: 725,
+        width: 1045,
+        height: 825,
         resizeable: false
     })
 
-    mainWindow.loadURL(`file://${__dirname}/neeko-main.html`)
+    mainWindow.loadURL(`file://${__dirname}/Ana-main.html`)
 
     mainWindow.toggleDevTools()
+
     mainWindow.on('close', _ => {
         mainWindow = null
     })
@@ -29,3 +30,5 @@ app.on('ready', _ => {
     Menu.setApplicationMenu(menuContents)
 
 })
+
+app.on('window-all-closed', app.quit)

@@ -12,6 +12,7 @@ const dialog = require('electron').remote.dialog
 
 const configurationLoader = require('./loadConfiguration')
 const starter = require('./start')
+const buildCanceler = require('./buildCanceler')
 
 const NETCoreFolder = "sf-build"
 const NETCoreDLLName = "sfbuild.dll"
@@ -159,6 +160,16 @@ exports.executeAnt = ( workingDirectory, buildEnvironment, buildWindow, document
             console.log('FAILED!! FAILED!! FAILED!!')
             failed = 1
         }
+
+        if(data.includes("Request ID for the current deploy task: ")) {
+            //just get the deploy id
+            //this method could change depending on the output from ant migration tool, must be continually monitored with every release
+            var requestId = data.toString().substring(data.lastIndexOf("task:"), data.lastIndexOf("[sf:deploy]")).replace("task: ", "").trim()
+            console.log("REQUEST ID: " + requestId)
+            buildCanceler.writeBuildIdToFile(buildEnvironment.toLowerCase(), requestId, buildWindow) 
+
+        }
+
         buildWindow.webContents.send('update-stdout-panel', data)
     })
 
@@ -218,41 +229,6 @@ function disableButton ( button ) {
     var disabledState = document.createAttribute("disabled")
     disabledState.value = ""
     button.setAttributeNode(disabledState)
-}
-
-function showBuildPanel () {
-    clearStdoutPanel()
-
-    var mainPanel = document.getElementById("mainPanel")
-    var buildPanel = document.getElementById("buildPanel")
-
-    if( !mainPanel.classList.contains("slds-hide") ) {
-        mainPanel.classList.add("slds-hide")
-    }
-
-    if( buildPanel.classList.contains("slds-hide") ) {
-        buildPanel.classList.remove("slds-hide")
-    }
-}
-
-function clearStdoutPanel() {
-    var stdoutPanel = document.getElementById("stdoutPanel")
-    while(stdoutPanel.hasChildNodes()) {
-        stdoutPanel.removeChild(stdoutPanel.lastChild)
-    }
-}
-
-function returnInterfaceToStartup() {
-    var mainPanel = document.getElementById("mainPanel")
-    var buildPanel = document.getElementById("buildPanel")
-
-    if( mainPanel.classList.contains("slds-hide") ) {
-        mainPanel.classList.remove("slds-hide")
-    }
-
-    if( !buildPanel.classList.contains("slds-hide") ) {
-        buildPanel.classList.add("slds-hide")
-    }
 }
 
 function reenableBuildButton () {

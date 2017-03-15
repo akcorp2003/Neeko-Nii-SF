@@ -1,0 +1,184 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="salesforce-lightning-design-system-2.2.1/assets/styles/salesforce-lightning-design-system.min.css" />
+        <link rel="stylesheet" href="styles/styles.css" />
+    </head>
+    <body>
+        <header class="slds-global-header_container">
+            <div class="slds-global-header slds-grid slds-grid--align-spread slds-wrap">
+                <div class="slds-global-header__item">
+                    <div class="slds-global-header__logo">
+                        <img src="salesforce-lightning-design-system-2.2.1/assets/images/logo-noname.svg" />
+                    </div>
+                </div>
+                <div class="slds-text-heading--large slds-text-align--center slds-text">
+                    Ana
+                </div>
+                <ul class="slds-global-header__item slds-grid slds-grid--vertical-align-center">
+                    <li>
+                        <span class="slds-icon_container slds-icon-standard-people">
+                            <svg class="slds-icon slds-icon--medium" aria-hidden="true">
+                                <use xlink:href="salesforce-lightning-design-system-2.2.1/assets/icons/standard-sprite/svg/symbols.svg#people"></use>
+                            </svg>
+                        </span>
+                    </li>
+                </ul>
+                
+            </div>
+            <div id="menu" class="slds-global-header slds-p-around--x-small">
+                <div class="slds-icon menuIcon">
+                    <img src="salesforce-lightning-design-system-2.2.1/assets/icons/utility/rows_60.png" />
+                </div>
+            </div>
+            
+        </header>
+        <div id="sideBar" class="slds-size--1-of-3 slds-border--right sideBarBackground sideBarMinimized">
+            <div class="slds-grid slds-size--1-of-1 slds-p-left--small slds-p-vertical--medium">
+                <svg height="60" class="octicon" viewBox="0 0 14 16" version="1.1" width="52" aria-hidden="true">
+                    <path id="gitfeature" fill="#2b8cbe" fill-rule="evenodd" d="M10 5c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v.3c-.02.52-.23.98-.63 1.38-.4.4-.86.61-1.38.63-.83.02-1.48.16-2 .45V4.72a1.993 1.993 0 0 0-1-3.72C.88 1 0 1.89 0 3a2 2 0 0 0 1 1.72v6.56c-.59.35-1 .99-1 1.72 0 1.11.89 2 2 2 1.11 0 2-.89 2-2 0-.53-.2-1-.53-1.36.09-.06.48-.41.59-.47.25-.11.56-.17.94-.17 1.05-.05 1.95-.45 2.75-1.25S8.95 7.77 9 6.73h-.02C9.59 6.37 10 5.73 10 5zM2 1.8c.66 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2C1.35 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2zm0 12.41c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zm6-8c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path>
+                </svg>
+                <div class="slds-p-around--small slds-text-heading--medium slds-align--absolute-center expandedText slds-hide">
+                    Create Feature
+                </div>
+            </div>
+            <div class="slds-grid slds-size--1-of-1 slds-p-left--small slds-p-vertical--medium">
+                <svg height="48" class="octicon" viewBox="0 0 14 16" version="1.1" width="40" aria-hidden="true">
+                    <path id="gitcommit" fill="#2b8cbe" fill-rule="evenodd" d="M10.86 7c-.45-1.72-2-3-3.86-3-1.86 0-3.41 1.28-3.86 3H0v2h3.14c.45 1.72 2 3 3.86 3 1.86 0 3.41-1.28 3.86-3H14V7h-3.14zM7 10.2c-1.22 0-2.2-.98-2.2-2.2 0-1.22.98-2.2 2.2-2.2 1.22 0 2.2.98 2.2 2.2 0 1.22-.98 2.2-2.2 2.2z"></path>
+                </svg>
+                <div class="slds-p-around--small slds-text-heading--medium slds-align--absolute-center expandedText slds-hide">
+                    Commit Files
+                </div>
+            </div>
+            <div class="slds-grid slds-size--1-of-1 slds-p-left--small slds-p-vertical--medium">
+                <svg height="48" class="octicon" viewBox="0 0 14 16" version="1.1" width="40" aria-hidden="true">
+                    <path id="gitbuild" fill="#2b8cbe" fill-rule="evenodd" d="M12.17 3.83c-.27-.27-.47-.55-.63-.88-.16-.31-.27-.66-.34-1.02-.58.33-1.16.7-1.73 1.13-.58.44-1.14.94-1.69 1.48-.7.7-1.33 1.81-1.78 2.45H3L0 10h3l2-2c-.34.77-1.02 2.98-1 3l1 1c.02.02 2.23-.64 3-1l-2 2v3l3-3v-3c.64-.45 1.75-1.09 2.45-1.78.55-.55 1.05-1.13 1.47-1.7.44-.58.81-1.16 1.14-1.72-.36-.08-.7-.19-1.03-.34a3.39 3.39 0 0 1-.86-.63M16 0s-.09.38-.3 1.06c-.2.7-.55 1.58-1.06 2.66-.7-.08-1.27-.33-1.66-.72-.39-.39-.63-.94-.7-1.64C13.36.84 14.23.48 14.92.28 15.62.08 16 0 16 0"></path>
+                </svg>
+                <div class="slds-p-around--small slds-text-heading--medium slds-align--absolute-center expandedText slds-hide">
+                    Deploy
+                </div>
+            </div>
+            <div class="slds-grid slds-size--1-of-1 slds-p-left--small slds-p-vertical--medium">
+                <svg height="48" class="octicon" viewBox="0 0 14 16" version="1.1" width="40" aria-hidden="true">
+                    <path id="gitfinish" fill="#2b8cbe" fill-rule="evenodd" d="M11 11.28V5c-.03-.78-.34-1.47-.94-2.06C9.46 2.35 8.78 2.03 8 2H7V0L4 3l3 3V4h1c.27.02.48.11.69.31.21.2.3.42.31.69v6.28A1.993 1.993 0 0 0 10 15a1.993 1.993 0 0 0 1-3.72zm-1 2.92c-.66 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2zM4 3c0-1.11-.89-2-2-2a1.993 1.993 0 0 0-1 3.72v6.56A1.993 1.993 0 0 0 2 15a1.993 1.993 0 0 0 1-3.72V4.72c.59-.34 1-.98 1-1.72zm-.8 10c0 .66-.55 1.2-1.2 1.2-.65 0-1.2-.55-1.2-1.2 0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2zM2 4.2C1.34 4.2.8 3.65.8 3c0-.65.55-1.2 1.2-1.2.65 0 1.2.55 1.2 1.2 0 .65-.55 1.2-1.2 1.2z"></path>
+                </svg>
+                <div class="slds-p-around--small slds-text-heading--medium slds-align--absolute-center expandedText slds-hide">
+                    Finish Feature
+                </div>
+            </div>
+        </div>
+        <div id="featurePanel" class="slds-scrollable" style="margin-top: 100px; margin-left: 90px;">
+            <div class="slds-grid slds-align--absolute-center" style="margin-top: 90px; padding-top: 75px;">
+                <div class="slds-p-around--medium">
+                    <svg width="50" height="50" viewBox="0 0 24 24">
+                        <circle cx="12"
+                                cy="12"
+                                r="12"
+                                style="fill: #34becd;"/>
+                        <text font-size="13"
+                            fill="white"
+                            x="8.1"
+                            y="16.3" 
+                            style="font-family: Salesforce Sans, Verdana, sans-serif">1</text>
+                    </svg>
+                </div>
+                <div class="slds-p-around--medium">
+                    <div id="featureNameInput" class="slds-form-element slds-size--1-of-1">
+                        <label class="slds-text-heading--large" for="branch-name">Your branch name: </label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="branch-name" class="slds-input" placeholder="Your branch name here." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="gitOutputPanel" class="slds-size--1-of-1 slds-align--absolute-center slds-scrollable">
+                <pre id="gitOutput" style="height: 200px;">
+                </pre>
+            </div>
+        </div>
+
+        <div id="commitPanel" class="slds-grid slds-hide" style="margin-top: 100px; margin-left: 90px;">
+            <div id="commitFileListPanel" class="slds-m-horizontal--large slds-m-bottom--x-large slds-border--right slds-scrollable slds-has-dividers--bottom-space slds-size--3-of-7">    
+            </div>
+            <div class="slds-size--4-of-7 slds-p-top--large">
+                <div class="slds-form--stacked slds-p-around--medium">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="commitMessage">Write your commit message below:</label>
+                        <div class="slds-form-element__control">
+                            <textarea id="commitMessage" class="slds-textarea"></textarea>
+                        </div>
+                    </div>
+                    <div class="slds-form-element">
+                        <button type="button" id="commitBtn" class="slds-button slds-button--brand">Commit!</button>
+                    </div>
+                </div>
+                <div class="slds-size--1-of-1 slds-scrollable slds-m-horizontal--small slds-border--top">
+                    <xmp class="slds-size--1-of-1 slds-p-bottom--x-large" id="uncommitedFileContents">
+                    </xmp>
+                </div>
+            </div>
+        </div>
+
+        <div id="mainPanel" class="slds-hide slds-grid" style="margin-top: 100px; margin-left: 90px;">  
+            <div id="fileListPanel" class="slds-m-horizontal--large slds-m-bottom--x-large slds-border--right slds-scrollable slds-has-dividers--bottom-space slds-size--3-of-7">    
+            </div>
+            <div class="slds-size--4-of-7 slds-p-top--large">
+                <div id="buildBar" class="slds-size--1-of-1 slds-scrollable slds-p-bottom--large">
+                    <div id="buttonStrip" class="slds-button-group">
+                        <button id="buildBtn" class="slds-button slds-button--success">BUILD!</button>
+                        <button id="myEnvBtn" class="slds-button slds-button--neutral">my</button>
+                    </div>
+                    
+                </div>
+                <div class="slds-size--1-of-1 slds-scrollable slds-m-horizontal--small slds-border--top">
+                    <xmp class="slds-size--1-of-1 slds-p-bottom--x-large" id="fileContents">
+                    </xmp>
+                </div>
+            </div>
+        </div>
+        
+
+        <div id="finishFeaturePanel" class="slds-hide" style="margin-top: 100px; margin-left: 90px;">
+            <div class="slds-size--1-of-1 slds-text-heading--large slds-align--absolute-center slds-p-around--medium" style="margin-top: 90px;">
+                Ready to finish feature?
+            </div>
+            <div class="slds-size--1-of-1 slds-align--absolute-center slds-p-around--small" style="margin-top: 90px;">
+                <div class="slds-p-around--medium">
+                    <svg width="50" height="50" viewBox="0 0 24 24">
+                        <circle cx="12"
+                                cy="12"
+                                r="12"
+                                style="fill: #34becd;"/>
+                        <text font-size="13"
+                            fill="white"
+                            x="8.1"
+                            y="16.3" 
+                            style="font-family: Salesforce Sans, Verdana, sans-serif">1</text>
+                    </svg>
+                </div>
+                <div class="slds-p-around--medium">
+                    <button class="slds-button slds-button--success slds-p-around--small slds-text-heading--medium" id="finishFeature">FINISH FEATURE</button>
+                </div>
+            </div>
+            <div id="gitFinishFeatureOutputPanel" class="slds-size--1-of-1 slds-scrollable slds-p-bottom--xx-large slds-align--absolute-center">
+                <pre id="finishFeatureOutputPanel" style="height: 250px;">
+                </pre>
+            </div>
+        </div>
+                
+
+        
+         <div id="branchName" class="slds-hide slds-docked-form-footer">
+             Current branch:
+        </div> 
+        <div id="featureFooter" class="slds-docked-form-footer">
+            <button type="button" id="createFeature" class="slds-button slds-button--brand">CREATE FEATURE!</button>
+        </div>
+
+        <script>require('./octiconHandler.js')</script>
+        <script>require('./panelDisplayer.js')</script>
+        <script>require('./start.js')</script>
+        <script>require('./fileDisplayer.js')</script>
+        <script>require('./featureCreator.js')</script>
+        <script>require('./featureCompleter.js')</script>
+    </body>
+</html>

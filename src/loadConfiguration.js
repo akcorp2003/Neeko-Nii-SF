@@ -49,6 +49,7 @@ exports.populateMainWindow = _ => {
 exports.findDirtyFiles = _ => {
     console.log('updating dirty files')
     fileDisplayer.loadDirtyFiles(repoFilepath, currentBranchName)
+    fileDisplayer.loadUncommitedFiles(repoFilepath, currentBranchName)
 }
 
 exports.updateTitle = _ => {

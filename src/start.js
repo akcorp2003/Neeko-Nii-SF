@@ -14,8 +14,9 @@ const featureCreator = require('./featureCreator')
 const buildExecutor = require('./buildExecutor')
 const featureCompleter = require('./featureCompleter')
 const panelDisplayer = require('./panelDisplayer')
-const circleHandler = require('./circleHandler')
+const octiconHandler = require('./octiconHandler')
 const menuIconHandler = require('./menuIcon')
+const fileCommiter = require('./fileCommiter')
 
 const defaultCircleColor = "#2b8cbe"
 const selectedCircleColor = "#a8ddb5" 
@@ -30,7 +31,29 @@ var btnEnvironmentToWindowID = {}
 
 window.addEventListener('DOMContentLoaded', _ => {
     console.log(__dirname)
+
     configurationLoader.populateMainWindow()
+
+    var createFeatureButton = document.getElementById("createFeature")
+    createFeatureButton.addEventListener("click", function onClick() {
+        var branchName = document.getElementById("branch-name").value.replace(/ /g, "_" )
+        console.log(branchName)
+        if( branchName ) {
+            featureCreator.createFeature(branchName)
+        } else {
+            dialog.showMessageBox({
+                type: "error",
+                buttons: ["OK"],
+                title: "No Feature Branch Name",
+                message: "Please enter a name for your feature"
+            })
+        }
+    })
+
+    var commitButton = document.getElementById("commitBtn")
+    commitButton.addEventListener("click", function() {
+        fileCommiter.commitFiles(document)
+    })
 
     var buildButton = document.getElementById("buildBtn")
     buildButton.addEventListener("click", function () {
@@ -44,7 +67,7 @@ window.addEventListener('DOMContentLoaded', _ => {
         .forEach(function (selectedButton) {
             let buildWindow = new BrowserWindow({
                                                     width: 873,
-                                                    height: 363,
+                                                    height: 203,
                                                     resizeable: false
                                                 })
 
@@ -55,6 +78,8 @@ window.addEventListener('DOMContentLoaded', _ => {
                 buildExecutor.killAllBuildProcesses()
                 console.log('I closed')
             })
+
+            buildWindow.toggleDevTools()
 
             console.log(selectedButton.innerText.toLowerCase())
 
@@ -93,22 +118,6 @@ window.addEventListener('DOMContentLoaded', _ => {
         menuIconHandler.openOrCloseMenu(document)
     }
 
-    var createFeatureButton = document.getElementById("createFeature")
-    createFeatureButton.addEventListener("click", function onClick() {
-        var branchName = document.getElementById("branch-name").value.replace(/ /g, "_" )
-        console.log(branchName)
-        if( branchName ) {
-            featureCreator.createFeature(branchName)
-        } else {
-            dialog.showMessageBox({
-                type: "error",
-                buttons: ["OK"],
-                title: "No Feature Branch Name",
-                message: "Please enter a name for your feature"
-            })
-        }
-    })
-
     var finishFeatureButton = document.getElementById("finishFeature")
     finishFeatureButton.addEventListener("click", function onClick() {
         featureCompleter.completeFeature()
@@ -140,7 +149,7 @@ window.addEventListener('DOMContentLoaded', _ => {
         }, 500)
     })
 
-    circleHandler.setCirclesOnSideBar()
+    octiconHandler.setOcticonsOnSidebar()
 
     configurationLoader.setBuildStrip()
 

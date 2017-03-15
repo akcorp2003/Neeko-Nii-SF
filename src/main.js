@@ -20,8 +20,6 @@ app.on('ready', _ => {
 
     mainWindow.loadURL(`file://${__dirname}/Ana-main.html`)
 
-    mainWindow.toggleDevTools()
-
     mainWindow.on('close', _ => {
         mainWindow = null
     })

@@ -6,7 +6,7 @@ const dialog = require('electron').remote.dialog
 
 const configurationLoader = require('./loadConfiguration')
 const panelDisplayer = require('./panelDisplayer')
-const circleHandler = require('./circleHandler')
+const octiconHandler = require('./octiconHandler')
 
 exports.createFeature = (featureName) => {
     //first pull from develop
@@ -80,7 +80,7 @@ function runGitFlowProcedures( repoPath, featureName ) {
                 nextStepButton.addEventListener("click", function () {
                     panelDisplayer.hideFeatureCreationPanel()
                     panelDisplayer.showMainPanel()
-                    circleHandler.clickCircle("2")
+                    octiconHandler.clickOcticon("gitcommit")
                 })
 
 

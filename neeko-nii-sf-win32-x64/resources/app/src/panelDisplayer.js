@@ -8,6 +8,16 @@ exports.hideFeatureCreationPanel = _ => {
     document.getElementById("featureFooter").classList.add("slds-hide")
 }
 
+exports.showCommitPanel = _ => {
+    document.getElementById("commitPanel").classList.remove("slds-hide")
+    document.getElementById("branchName").classList.remove("slds-hide")
+}
+
+exports.hideCommitPanel = _ => {
+    document.getElementById("commitPanel").classList.add("slds-hide")
+    document.getElementById("branchName").classList.add("slds-hide")
+}
+
 exports.showMainPanel = _ => {
     document.getElementById("mainPanel").classList.remove("slds-hide")
     document.getElementById("branchName").classList.remove("slds-hide")
@@ -16,16 +26,6 @@ exports.showMainPanel = _ => {
 exports.hideMainPanel = _ => {
     document.getElementById("mainPanel").classList.add("slds-hide")
     document.getElementById("branchName").classList.add("slds-hide")
-}
-
-exports.showBuildPanel = _ => {
-    clearStdoutPanel()
-    document.getElementById("buildPanel").classList.remove("slds-hide")
-    document.getElementById("branchName").classList.remove("slds-hide")
-}
-
-exports.hideBuildPanel = _ => {
-    document.getElementById("buildPanel").classList.add("slds-hide")
 }
 
 exports.showFinishFeaturePanel = _ => {
